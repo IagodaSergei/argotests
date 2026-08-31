@@ -9,6 +9,9 @@ spec:
     chart: cluster
     repoURL: https://cloudnative-pg.github.io/charts
     targetRevision: 0.8.1
+    helm:
+      valueFiles:
+        - cluster-values.yaml
   destination:
     server: "https://kubernetes.default.svc"
     namespace: psql-18

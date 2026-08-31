@@ -1,0 +1,32 @@
+type: postgresql
+
+version:
+  # -- PostgreSQL major version to use
+  postgresql: "18"
+
+cluster:
+  # -- Number of instances
+  instances: 2
+
+  imageName: "cloudnative-pg/postgresql:18.6-standard-trixie"
+
+  storage:
+    size: 8Gi
+    storageClass: ""
+
+  walStorage:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+
+  monitoring:
+    # -- Whether to enable monitoring
+    enabled: false
+
+backups:
+  # -- You need to configure backups manually, so backups are disabled by default.
+  enabled: false
+
+databases: []
+
+poolers: []
