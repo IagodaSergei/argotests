@@ -1,0 +1,111 @@
+type: postgresql
+
+mode: standalone
+
+version:
+  # -- PostgreSQL major version to use
+  postgresql: "18"
+
+cluster:
+  # -- Number of instances
+  instances: 1
+
+  imageName: "ghcr.io/cloudnative-pg/postgresql:17.6-standard-trixie"
+
+  storage:
+    size: 8Gi
+    storageClass: ""
+
+  walStorage:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+
+  logLevel: "info"
+
+  monitoring:
+    # -- Whether to enable monitoring
+    enabled: false
+
+  initdb:
+    database: test
+    owner: test
+    encoding: UTF8
+
+  postgresql:
+    # -- PostgreSQL configuration options (postgresql.conf)
+    parameters:
+      max_connections: "300"
+      shared_buffers: "512MB"
+      effective_cache_size: "1536MB"
+      work_mem: "8MB"
+      maintenance_work_mem: "128MB"
+      wal_compression: "on"
+      checkpoint_timeout: "15min"
+
+backups:
+  # -- You need to configure backups manually, so backups are disabled by default.
+  enabled: false
+
+databases: []
+
+poolers:
+  - name: rw
+    type: rw
+    poolMode: transaction
+    instances: 2
+    parameters:
+      max_client_conn: "2000"
+      default_pool_size: "50"
+      min_pool_size: "10"
+      reserve_pool_size: "20"
+      reserve_pool_timeout: "5"
+
+      server_idle_timeout: "60"
+      client_idle_timeout: "300"
+      idle_transaction_timeout: "60"
+
+      log_connections: "1"
+      log_disconnections: "1"
+      log_pooler_errors: "1"
+    template:
+      spec:
+        containers:
+          - name: pgbouncer
+            image: ghcr.io/cloudnative-pg/pgbouncer:1.25.1
+            imagePullPolicy: IfNotPresent
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+  - name: ro
+    type: ro
+    poolMode: transaction
+    instances: 2
+    parameters:
+      max_client_conn: "2000"
+      default_pool_size: "50"
+      min_pool_size: "10"
+      reserve_pool_size: "20"
+      reserve_pool_timeout: "5"
+
+      server_idle_timeout: "60"
+      client_idle_timeout: "300"
+      idle_transaction_timeout: "60"
+
+      log_connections: "1"
+      log_disconnections: "1"
+      log_pooler_errors: "1"
+    template:
+      spec:
+        containers:
+          - name: pgbouncer
+            image: ghcr.io/cloudnative-pg/pgbouncer:1.25.1
+            imagePullPolicy: IfNotPresent
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi

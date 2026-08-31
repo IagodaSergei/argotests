@@ -1,26 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster
+  name: metrics-server
   namespace: argocd
 spec:
   project: default
 
-  sources:
-    - repoURL: https://cloudnative-pg.github.io/charts
-      chart: cluster
-      targetRevision: 0.8.1
-      helm:
-        valueFiles:
-          - $values/apps/cluster/values.yaml
-    - repoURL: https://github.com/IagodaSergei/argotests.git
-      targetRevision: main
-      ref: values
-      path: ./apps
+  source:
+    chart: metrics-server
+    repoURL: https://kubernetes-sigs.github.io/metrics-server/
+    targetRevision: 3.14.0
 
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: psql-18
+    namespace: metrics-server
 
   syncPolicy:
     automated:
