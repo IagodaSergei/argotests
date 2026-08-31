@@ -45,24 +45,38 @@ cluster:
     - name: audit_user
       ensure: present
       login: true
+      connectionLimit: -1
+      inherit: true
     - name: user_user
       ensure: present
       login: true
+      connectionLimit: -1
+      inherit: true
     - name: mail_gateway_user
       ensure: present
       login: true
+      connectionLimit: -1
+      inherit: true
     - name: cron_user
       ensure: present
       login: true
+      connectionLimit: -1
+      inherit: true
     - name: assetor_user
       ensure: present
       login: true
+      connectionLimit: -1
+      inherit: true
     - name: lccore_user
       ensure: present
       login: true
+      connectionLimit: -1
+      inherit: true
     - name: dviewer_user
       ensure: present
       login: true
+      connectionLimit: -1
+      inherit: true
 
 
 backups:
