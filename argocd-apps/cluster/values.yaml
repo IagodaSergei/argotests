@@ -69,7 +69,21 @@ backups:
   # -- You need to configure backups manually, so backups are disabled by default.
   enabled: false
 
-databases: []
+databases:
+  - name: audit
+    ensure: present
+    owner: audit_user
+    encoding: UTF8
+
+  - name: userdb
+    ensure: present
+    owner: user_user
+    encoding: UTF8
+
+  - name: mailer
+    ensure: present
+    owner: mail_gateway_user
+    encoding: UTF8
 
 poolers:
   - name: rw
