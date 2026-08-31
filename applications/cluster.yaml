@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster
+  namespace: argocd
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://cloudnative-pg.github.io/charts
+      chart: cluster
+      targetRevision: 0.8.1
+    - repoURL: https://github.com/IagodaSergei/argotests.git
+      targetRevision: main
+      ref: values
+      path: values
+      helm:
+        valueFiles:
+          - cluster-values.yaml
+
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: psql-18
+
+  syncPolicy:
+    automated:
+      prune: true    # Deletes resources if they are removed from Git
+      selfHeal: true # Re-applies resources if they are manually changed in the cluster
+    syncOptions:
+      - CreateNamespace=true 
+      - ServerSideApply=true
