@@ -12,11 +12,11 @@ spec:
       targetRevision: 0.8.1
       helm:
         valueFiles:
-          - $values/apps/cluster/values.yaml
+          - $values/argocd-apps/cluster/values.yaml
     - repoURL: https://github.com/IagodaSergei/argotests.git
       targetRevision: main
       ref: values
-      path: ./apps
+      path: ./argocd-apps
 
   destination:
     server: "https://kubernetes.default.svc"

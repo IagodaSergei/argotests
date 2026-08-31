@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  sources:
+    - repoURL: https://charts.longhorn.io
+      chart: longhorn
+      targetRevision: 1.12.1
+      helm:
+        releaseName: longhorn
+        valueFiles:
+          - $values/argocd-apps/longhorn/values.yaml
+    - repoURL: https://github.com/IagodaSergei/argotests.git
+      targetRevision: main
+      ref: values
+      path: ./argocd-apps
+      
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+    
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,132 @@
+# Longhorn configuration for single-disk setup
+defaultSettings:
+  # Critical for single-disk: only 1 replica
+  defaultReplicaCount: 1
+  
+  # Keep data local when possible (better performance)
+  defaultDataLocality: "best-effort"
+  
+  # Reserve 30% disk space for system stability
+  storageReservedPercentageForDefaultDisk: 30
+  
+  # Mark disk as unschedulable if less than 15% free
+  storageMinimalAvailablePercentage: 15
+  
+  # Allow scheduling on all nodes by default
+  createDefaultDiskLabeledNodes: false
+  
+  # Enable automatic salvage for failed replicas
+  autoSalvage: true
+  
+  # Disable auto-delete when volume is detached unexpectedly
+  autoDeletePodWhenVolumeDetachedUnexpectedly: false
+  
+  # CRD webhook validation
+  creatingBackingImage: false
+  
+  # Registry secret for pulling images (if needed)
+  registrySecret: ""
+  
+  # Backup target (configure later if you have S3/MinIO)
+  backupTarget: ""
+  backupTargetCredentialSecret: ""
+  
+  # Allow recurring job while volume is detached
+  allowRecurringJobWhileVolumeDetached: false
+  
+  # Fast replica rebuilding
+  fastReplicaRebuildEnabled: true
+  
+  # Node drain policy
+  nodeDownPodDeletionPolicy: "do-nothing"
+  
+  # Allow empty node selector
+  allowEmptyNodeSelectorVolume: true
+  allowEmptyDiskSelectorVolume: true
+
+persistence:
+  defaultFsType: ext4
+  defaultMkfsParams: ""
+  defaultClassReplicaCount: 1
+  defaultDataLocality: "best-effort"
+  reclaimPolicy: Delete
+
+# Resource management for single-disk setup
+longhornManager:
+  priorityClass: ""
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+longhornDriver:
+  priorityClass: ""
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+longhornUI:
+  replicas: 1
+  priorityClass: ""
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# CSI driver configuration
+csi:
+  kubeletRootDir: /var/lib/kubelet
+  attacherReplicaCount: 1
+  provisionerReplicaCount: 1
+  resizerReplicaCount: 1
+  snapshotterReplicaCount: 1
+
+# Disable ingress by default (enable if needed)
+ingress:
+  enabled: false
+  # enabled: true
+  # host: longhorn.your-domain.com
+  # ingressClassName: nginx
+  # annotations:
+  #   nginx.ingress.kubernetes.io/auth-type: basic
+  #   nginx.ingress.kubernetes.io/auth-secret: longhorn-basic-auth
+  #   nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+  # tls: false
+
+# Service UI configuration
+service:
+  ui:
+    type: ClusterIP
+    nodePort: null
+
+# Metrics configuration (optional)
+metrics:
+  enabled: false
+  # enabled: true
+  # serviceMonitor:
+  #   enabled: false
+
+# Pre-upgrade checks
+preUpgradeChecker:
+  jobEnabled: false
+  versionCheckEnabled: false
+
+# Uninstall job
+uninstallJob:
+  enabled: false
