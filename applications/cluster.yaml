@@ -10,13 +10,13 @@ spec:
     - repoURL: https://cloudnative-pg.github.io/charts
       chart: cluster
       targetRevision: 0.8.1
+      helm:
+        valueFiles:
+          - $values/cluster-values.yaml
     - repoURL: https://github.com/IagodaSergei/argotests.git
       targetRevision: main
       ref: values
       path: values
-      helm:
-        valueFiles:
-          - cluster-values.yaml
 
   destination:
     server: "https://kubernetes.default.svc"
