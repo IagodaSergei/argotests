@@ -41,6 +41,30 @@ cluster:
     parameters:
       max_connections: "300"
 
+  roles:
+    - name: audit_user
+      ensure: present
+      login: true
+    - name: user_user
+      ensure: present
+      login: true
+    - name: mail_gateway_user
+      ensure: present
+      login: true
+    - name: cron_user
+      ensure: present
+      login: true
+    - name: assetor_user
+      ensure: present
+      login: true
+    - name: lccore_user
+      ensure: present
+      login: true
+    - name: dviewer_user
+      ensure: present
+      login: true
+
+
 backups:
   # -- You need to configure backups manually, so backups are disabled by default.
   enabled: false
