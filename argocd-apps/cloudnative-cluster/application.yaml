@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: cluster
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"  # Применяется после secrets
 spec:
   project: default
 
@@ -12,7 +14,7 @@ spec:
       targetRevision: 0.8.1
       helm:
         valueFiles:
-          - $values/argocd-apps/cluster/values.yaml
+          - $values/argocd-apps/cloudnative-cluster/values.yaml
     - repoURL: https://github.com/IagodaSergei/argotests.git
       targetRevision: main
       ref: values

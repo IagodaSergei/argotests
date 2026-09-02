@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: 'https://github.com/IagodaSergei/argotests.git' 
     targetRevision: main
-    path: charts/local-path-provisioner
+    path: argocd-apps/local-path-provisioner/manifests
     
   destination:
     server: 'https://kubernetes.default.svc'

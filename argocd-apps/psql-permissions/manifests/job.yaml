@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-permissions-script
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+data:
+  setup-permissions.sql: |
+    
+    GRANT CONNECT ON DATABASE postgres TO cron_user;
+    GRANT CONNECT ON DATABASE postgres TO assetor_user;
+    GRANT CONNECT ON DATABASE postgres TO lccore_user;
+    GRANT CONNECT ON DATABASE postgres TO dviewer_user;
+    GRANT CONNECT ON DATABASE postgres TO user_user;
+    
+    GRANT CREATE ON DATABASE postgres TO assetor_user;
+    GRANT CREATE ON DATABASE postgres TO lccore_user;
+    GRANT CREATE ON DATABASE postgres TO dviewer_user;
+    GRANT CREATE ON DATABASE postgres TO user_user;
+
+    ALTER ROLE assetor_user SET search_path = pool;
+    ALTER ROLE lccore_user SET search_path = activation;
+    ALTER ROLE dviewer_user SET search_path = dviewer;
+
+    GRANT USAGE, CREATE ON SCHEMA pool TO assetor_user;
+    GRANT USAGE, CREATE ON SCHEMA activation TO lccore_user;
+    GRANT USAGE, CREATE ON SCHEMA catalog TO lccore_user;
+    GRANT USAGE, CREATE ON SCHEMA dviewer TO dviewer_user;
+    GRANT USAGE, CREATE ON SCHEMA auth TO user_user;
+
+    GRANT USAGE ON SCHEMA activation, catalog TO assetor_user;
+    GRANT USAGE ON SCHEMA auth TO user_user;
+    
+    GRANT USAGE ON SCHEMA activation, catalog, pool TO dviewer_user;
+    GRANT USAGE ON SCHEMA pool TO lccore_user;
+
+    GRANT SELECT ON ALL TABLES IN SCHEMA activation, catalog TO assetor_user;
+    GRANT INSERT ON ALL TABLES IN SCHEMA auth TO user_user;
+    GRANT SELECT ON ALL TABLES IN SCHEMA activation, catalog, pool TO dviewer_user;
+    GRANT SELECT ON ALL TABLES IN SCHEMA dviewer TO dviewer_user;
+    GRANT SELECT ON ALL TABLES IN SCHEMA pool TO lccore_user;
+
+    ALTER DEFAULT PRIVILEGES FOR ROLE lccore_user IN SCHEMA activation GRANT SELECT ON TABLES TO assetor_user;
+    ALTER DEFAULT PRIVILEGES FOR ROLE lccore_user IN SCHEMA catalog GRANT SELECT ON TABLES TO assetor_user;
+    ALTER DEFAULT PRIVILEGES FOR ROLE assetor_user IN SCHEMA pool GRANT SELECT ON TABLES TO lccore_user;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA dviewer GRANT SELECT ON TABLES TO dviewer_user;
+    ALTER DEFAULT PRIVILEGES FOR ROLE lccore_user IN SCHEMA activation GRANT SELECT ON TABLES TO dviewer_user;
+    ALTER DEFAULT PRIVILEGES FOR ROLE lccore_user IN SCHEMA catalog GRANT SELECT ON TABLES TO dviewer_user;
+    ALTER DEFAULT PRIVILEGES FOR ROLE assetor_user IN SCHEMA pool GRANT SELECT ON TABLES TO dviewer_user;
+
+    REVOKE ALL ON SCHEMA public FROM PUBLIC;
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: apply-db-permissions-v1
+  annotations:
+    # Hook запускает Job в фазе Sync
+    argocd.argoproj.io/hook: Sync
+    # Удаляет старый Job перед созданием нового (для идемпотентности)
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      containers:
+        - name: psql-client
+          image: postgres:18-alpine
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Applying database permissions in postgres database..."
+              PGPASSWORD="$SUPERUSER_PASSWORD" psql \
+                -h cluster-rw \
+                -U postgres \
+                -d postgres \
+                -f /scripts/setup-permissions.sql
+              echo "Permissions applied successfully!"
+          env:
+            - name: SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-superuser
+                  key: password
+          volumeMounts:
+            - name: sql-script
+              mountPath: /scripts
+      volumes:
+        - name: sql-script
+          configMap:
+            name: postgres-permissions-script
+      restartPolicy: Never
+  backoffLimit: 3
