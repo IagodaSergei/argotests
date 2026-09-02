@@ -114,26 +114,6 @@ databases:
     owner: mail_gateway_user
     encoding: UTF8
 
-  - name: postgres
-    ensure: present
-    owner: postgres
-    schemas:
-      - name: pool
-        owner: postgres
-        ensure: present
-      - name: activation
-        owner: postgres
-        ensure: present
-      - name: catalog
-        owner: postgres
-        ensure: present
-      - name: dviewer
-        owner: postgres
-        ensure: present
-      - name: auth
-        owner: postgres
-        ensure: present
-
 poolers:
   - name: rw
     type: rw

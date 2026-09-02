@@ -23,6 +23,12 @@ data:
     ALTER ROLE lccore_user SET search_path = activation;
     ALTER ROLE dviewer_user SET search_path = dviewer;
 
+    CREATE SCHEMA IF NOT EXISTS pool;
+    CREATE SCHEMA IF NOT EXISTS activation;
+    CREATE SCHEMA IF NOT EXISTS catalog;
+    CREATE SCHEMA IF NOT EXISTS dviewer;
+    CREATE SCHEMA IF NOT EXISTS auth;
+
     GRANT USAGE, CREATE ON SCHEMA pool TO assetor_user;
     GRANT USAGE, CREATE ON SCHEMA activation TO lccore_user;
     GRANT USAGE, CREATE ON SCHEMA catalog TO lccore_user;
