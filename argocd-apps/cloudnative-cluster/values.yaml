@@ -43,96 +43,96 @@ cluster:
 
     pg_hba: []
 
-  roles: []
-    # - name: cron_user
-    #   ensure: present
-    #   login: true
-    #   passwordSecret:
-    #     name: cron-user-password
-    #   connectionLimit: -1
-    #   inherit: true
-    # - name: assetor_user
-    #   ensure: present
-    #   login: true
-    #   passwordSecret:
-    #     name: assetor-user-password
-    #   connectionLimit: -1
-    #   inherit: true
-    # - name: lccore_user
-    #   ensure: present
-    #   login: true
-    #   passwordSecret:
-    #     name: lccore-user-password
-    #   connectionLimit: -1
-    #   inherit: true
-    # - name: dviewer_user
-    #   ensure: present
-    #   login: true
-    #   passwordSecret:
-    #     name: dviewer-user-password
-    #   connectionLimit: -1
-    #   inherit: true
-    # - name: audit_user
-    #   ensure: present
-    #   login: true
-    #   passwordSecret:
-    #     name: audit-user-password
-    #   connectionLimit: -1
-    #   inherit: true
-    # - name: user_user
-    #   ensure: present
-    #   login: true
-    #   passwordSecret:
-    #     name: user-user-password
-    #   connectionLimit: -1
-    #   inherit: true
-    # - name: mail_gateway_user
-    #   ensure: present
-    #   login: true
-    #   passwordSecret:
-    #     name: mail-gateway-user-password
-    #   connectionLimit: -1
-    #   inherit: true
+  roles:
+    - name: cron_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: cron-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: assetor_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: assetor-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: lccore_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: lccore-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: dviewer_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: dviewer-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: audit_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: audit-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: user_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: user-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: mail_gateway_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: mail-gateway-user-password
+      connectionLimit: -1
+      inherit: true
     
 backups:
   # -- You need to configure backups manually, so backups are disabled by default.
   enabled: false
 
-databases: []
-  # - name: audit
-  #   ensure: present
-  #   owner: audit_user
-  #   encoding: UTF8
+databases:
+  - name: audit
+    ensure: present
+    owner: audit_user
+    encoding: UTF8
 
-  # - name: userdb
-  #   ensure: present
-  #   owner: user_user
-  #   encoding: UTF8
+  - name: userdb
+    ensure: present
+    owner: user_user
+    encoding: UTF8
 
-  # - name: mailer
-  #   ensure: present
-  #   owner: mail_gateway_user
-  #   encoding: UTF8
+  - name: mailer
+    ensure: present
+    owner: mail_gateway_user
+    encoding: UTF8
 
-  # - name: postgres
-  #   ensure: present
-  #   owner: postgres
-  #   schemas:
-  #     - name: pool
-  #       owner: postgres
-  #       ensure: present
-  #     - name: activation
-  #       owner: postgres
-  #       ensure: present
-  #     - name: catalog
-  #       owner: postgres
-  #       ensure: present
-  #     - name: dviewer
-  #       owner: postgres
-  #       ensure: present
-  #     - name: auth
-  #       owner: postgres
-  #       ensure: present
+  - name: postgres
+    ensure: present
+    owner: postgres
+    schemas:
+      - name: pool
+        owner: postgres
+        ensure: present
+      - name: activation
+        owner: postgres
+        ensure: present
+      - name: catalog
+        owner: postgres
+        ensure: present
+      - name: dviewer
+        owner: postgres
+        ensure: present
+      - name: auth
+        owner: postgres
+        ensure: present
 
 poolers:
   - name: rw
