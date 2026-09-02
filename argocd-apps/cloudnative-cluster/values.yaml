@@ -16,6 +16,16 @@ cluster:
     container.apparmor.security.beta.kubernetes.io/postgres: unconfined
     container.apparmor.security.beta.kubernetes.io/initdb: unconfined
 
+  services:
+    additional:
+      - selectorType: rw
+        serviceTemplate:
+          metadata:
+            name: "cluster-nodeport"
+          spec:
+            type: NodePort
+        updateStrategy: patch
+
   storage:
     size: 8Gi
     storageClass: ""
