@@ -52,7 +52,7 @@ cluster:
       max_connections: "300"
 
     pg_hba:
-      - hostssl replication streaming_replica 10.0.0.5/32 cert clientcert=verify-ca
+      - hostssl replication streaming_replica 10.0.0.5/32 cert clientcert=verify-full
 
   roles:
     - name: cron_user
