@@ -110,10 +110,10 @@ backups:
   enabled: true
 
   # -- One of `barmanObjectStore` (default) or `plugin`
-  method: barmanObjectStore
+  method: plugin
 
-  pluginConfiguration: {}
-#    name: barman-cloud.cloudnative-pg.io
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
 
   # Barman Object Store configuration applicable to both `barmanObjectStore` and `plugin` methods when using
   # the `barman-cloud.cloudnative-pg.io` plugin.

@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudnative-plugin-barman-cloud
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    chart: plugin-barman-cloud
+    repoURL: https://cloudnative-pg.github.io/charts
+    targetRevision: 0.7.0
+
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: psql-18
+
+  syncPolicy:
+    automated:
+      prune: true    # Deletes resources if they are removed from Git
+      selfHeal: true # Re-applies resources if they are manually changed in the cluster
+    syncOptions:
+      - CreateNamespace=true 
+      - ServerSideApply=true

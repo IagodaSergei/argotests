@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    chart: cert-manager
+    repoURL: https://charts.jetstack.io
+    targetRevision: v1.21.1
+    helm:
+      parameters:
+        # Equivalent to: --set crds.enabled=true
+        - name: crds.enabled
+          value: "true"
+          
+        # RECOMMENDED: Disable the post-install hook to prevent ArgoCD sync timeouts
+        # The startupapicheck often races with the API server registering the new CRDs.
+        # Disabling it is safe because ArgoCD will naturally verify the deployment succeeds.
+        - name: startupapicheck.enabled
+          value: "false"
+
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: cert-manager
+
+  syncPolicy:
+    automated:
+      prune: true    # Deletes resources if they are removed from Git
+      selfHeal: true # Re-applies resources if they are manually changed in the cluster
+    syncOptions:
+      - CreateNamespace=true 
+      - ServerSideApply=true
