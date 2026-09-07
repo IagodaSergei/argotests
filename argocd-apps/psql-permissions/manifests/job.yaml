@@ -79,7 +79,7 @@ spec:
             - |
               echo "Applying database permissions in postgres database..."
               PGPASSWORD="$SUPERUSER_PASSWORD" psql \
-                -h cluster-rw \
+                -h demo-psql-cluster-rw \
                 -U postgres \
                 -d postgres \
                 -f /scripts/setup-permissions.sql
@@ -88,7 +88,7 @@ spec:
             - name: SUPERUSER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: cluster-superuser
+                  name: demo-psql-cluster-superuser
                   key: password
           volumeMounts:
             - name: sql-script
