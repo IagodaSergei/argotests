@@ -182,9 +182,21 @@ backups:
       # -- Backup owner reference
       backupOwnerReference: self
       # -- Backup method, can be `barmanObjectStore` (default), `volumeSnapshot` or `plugin`.
-      method: barmanObjectStore
-      pluginConfiguration: {}
-#        name: barman-cloud.cloudnative-pg.io
+      method: plugin
+      pluginConfiguration:
+       name: barman-cloud.cloudnative-pg.io
+
+    -
+      # -- Scheduled backup name
+      name: hourly-backup
+      # -- Schedule in cron format
+      schedule: "0 0 * * * *"
+      # -- Backup owner reference
+      backupOwnerReference: self
+      # -- Backup method, can be `barmanObjectStore` (default), `volumeSnapshot` or `plugin`.
+      method: plugin
+      pluginConfiguration:
+       name: barman-cloud.cloudnative-pg.io
 
   # -- Retention policy for backups
   retentionPolicy: "5d"
