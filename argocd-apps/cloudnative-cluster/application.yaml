@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster
+  name: demo-psql-cluster
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "10"  # Применяется после secrets
