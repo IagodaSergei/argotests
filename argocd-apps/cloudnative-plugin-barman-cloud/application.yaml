@@ -9,11 +9,11 @@ spec:
   source:
     chart: plugin-barman-cloud
     repoURL: https://cloudnative-pg.github.io/charts
-    targetRevision: 0.7.0
+    targetRevision: 0.8.0
 
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: psql-18
+    namespace: cnpg-system
 
   syncPolicy:
     automated:

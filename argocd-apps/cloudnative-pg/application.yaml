@@ -13,7 +13,7 @@ spec:
 
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: psql-18
+    namespace: cnpg-system
 
   syncPolicy:
     automated:
