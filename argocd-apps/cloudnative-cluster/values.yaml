@@ -186,7 +186,7 @@ cluster:
 
   # -- Name of the container image, supporting both tags (<image>:<tag>) and digests for deterministic and repeatable deployments:
   # <image>:<tag>@sha256:<digestValue>
-  imageName: "ghcr.io/cloudnative-pg/postgresql:18.6-system-trixie"
+  imageName: "ghcr.io/cloudnative-pg/postgresql:18.6-standard-trixie"
 
   # -- Reference to `ImageCatalog` of `ClusterImageCatalog`, if specified takes precedence over `cluster.imageName`
   imageCatalogRef: {}
@@ -481,7 +481,7 @@ cluster:
 
 backups:
   # -- You need to configure backups manually, so backups are disabled by default.
-  enabled: true
+  enabled: false
 
   # -- Overrides the provider specific default endpoint. Defaults to:
   # S3: https://s3.<region>.amazonaws.com"
