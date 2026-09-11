@@ -1,0 +1,267 @@
+type: postgresql
+
+mode: standalone
+
+version:
+  # -- PostgreSQL major version to use
+  postgresql: "18"
+
+cluster:
+  # -- Number of instances
+  instances: 2
+
+  imageName: "ghcr.io/cloudnative-pg/postgresql:18.6-standard-trixie"
+
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/postgres: unconfined
+    container.apparmor.security.beta.kubernetes.io/initdb: unconfined
+
+  services:
+    additional:
+      - selectorType: rw
+        serviceTemplate:
+          metadata:
+            name: "cluster-nodeport"
+          spec:
+            type: NodePort
+        updateStrategy: patch
+
+  storage:
+    size: 8Gi
+    storageClass: ""
+
+  walStorage:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+
+  logLevel: "info"
+
+  monitoring:
+    # -- Whether to enable monitoring
+    enabled: false
+
+  initdb:
+    database: test
+    owner: test
+    encoding: UTF8
+
+  postgresql:
+    # -- PostgreSQL configuration options (postgresql.conf)
+    parameters:
+      max_connections: "300"
+
+    pg_hba:
+      - hostssl replication streaming_replica 10.0.0.5/32 cert clientcert=verify-full
+
+  roles:
+    - name: cron_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: cron-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: assetor_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: assetor-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: lccore_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: lccore-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: dviewer_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: dviewer-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: audit_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: audit-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: user_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: user-user-password
+      connectionLimit: -1
+      inherit: true
+    - name: mail_gateway_user
+      ensure: present
+      login: true
+      passwordSecret:
+        name: mail-gateway-user-password
+      connectionLimit: -1
+      inherit: true
+    
+backups:
+  # -- You need to configure backups manually, so backups are disabled by default.
+  enabled: true
+
+  # -- One of `barmanObjectStore` (default) or `plugin`
+  method: plugin
+
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
+
+  # Barman Object Store configuration applicable to both `barmanObjectStore` and `plugin` methods when using
+  # the `barman-cloud.cloudnative-pg.io` plugin.
+
+  # -- Overrides the provider specific default endpoint.
+  endpointURL: https://storage.yandexcloud.net
+  # Defaults to:
+  # S3: https://s3.<region>.amazonaws.com"
+  # Leave empty if using the default S3 endpoint
+
+  # -- Specifies a CA bundle to validate a privately signed certificate.
+  endpointCA:
+    # -- Creates a secret with the given value if true, otherwise uses an existing secret.
+    create: false
+    name: ""
+    key: ""
+    value: ""
+
+  # -- Overrides the provider specific default path.
+  destinationPath: ""
+  # Defaults to:
+  # S3: s3://<bucket><path>
+  # Azure: https://<storageAccount>.<serviceName>.core.windows.net/<containerName><path>
+  # Google: gs://<bucket><path>
+
+  # -- One of `s3`, `azure` or `google`
+  provider: s3
+  s3:
+    region: ru-central1
+    bucket: cnpg-cluster
+    path: "/psql-clusters"
+    accessKey: ""
+    secretKey: ""
+    # -- Use the role based authentication without providing explicitly the keys
+    inheritFromIAMRole: false
+  secret:
+    # -- Whether to create a secret for the backup credentials
+    create: false
+    # -- Name of the backup credentials secret
+    name: s3-creds
+
+  # -- The configuration for the Barman Cloud Plugin sidecar that runs in the instance pods. See: https://cloudnative-pg.io/plugin-barman-cloud/docs/next/plugin-barman-cloud.v1/#instancesidecarconfiguration
+  instanceSidecarConfiguration: {}
+
+  wal:
+    # -- WAL compression method. One of `` (for no compression), `gzip`, `bzip2` or `snappy`.
+    compression: gzip
+    # -- Whether to instruct the storage provider to encrypt WAL files. One of `` (use the storage container default), `AES256` or `aws:kms`.
+    encryption: ''
+    # -- Number of WAL files to be archived or restored in parallel.
+    maxParallel: 1
+  data:
+    # -- Data compression method. One of `` (for no compression), `gzip`, `bzip2` or `snappy`.
+    compression: gzip
+    # -- Whether to instruct the storage provider to encrypt data files. One of `` (use the storage container default), `AES256` or `aws:kms`.
+    encryption: ''
+    # -- Number of data files to be archived or restored in parallel.
+    jobs: 2
+
+  scheduledBackups:
+    -
+      # -- Scheduled backup name
+      name: hourly-backup
+      # -- Schedule in cron format
+      schedule: "0 0 * * * *"
+      # -- Backup owner reference
+      backupOwnerReference: self
+      # -- Backup method, can be `barmanObjectStore` (default), `volumeSnapshot` or `plugin`.
+      method: plugin
+      pluginConfiguration:
+       name: barman-cloud.cloudnative-pg.io
+
+  # -- Retention policy for backups
+  retentionPolicy: "1d"
+
+databases:
+  - name: audit
+    ensure: present
+    owner: audit_user
+    encoding: UTF8
+
+  - name: userdb
+    ensure: present
+    owner: user_user
+    encoding: UTF8
+
+  - name: mailer
+    ensure: present
+    owner: mail_gateway_user
+    encoding: UTF8
+
+poolers:
+  - name: rw
+    type: rw
+    poolMode: transaction
+    instances: 2
+    parameters:
+      max_client_conn: "2000"
+      default_pool_size: "50"
+      min_pool_size: "10"
+      reserve_pool_size: "20"
+      reserve_pool_timeout: "5"
+
+      server_idle_timeout: "60"
+      client_idle_timeout: "300"
+      idle_transaction_timeout: "60"
+
+      log_connections: "1"
+      log_disconnections: "1"
+      log_pooler_errors: "1"
+    template:
+      spec:
+        containers:
+          - name: pgbouncer
+            image: ghcr.io/cloudnative-pg/pgbouncer:1.25.1
+            imagePullPolicy: IfNotPresent
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+  - name: ro
+    type: ro
+    poolMode: transaction
+    instances: 2
+    parameters:
+      max_client_conn: "2000"
+      default_pool_size: "50"
+      min_pool_size: "10"
+      reserve_pool_size: "20"
+      reserve_pool_timeout: "5"
+
+      server_idle_timeout: "60"
+      client_idle_timeout: "300"
+      idle_transaction_timeout: "60"
+
+      log_connections: "1"
+      log_disconnections: "1"
+      log_pooler_errors: "1"
+    template:
+      spec:
+        containers:
+          - name: pgbouncer
+            image: ghcr.io/cloudnative-pg/pgbouncer:1.25.1
+            imagePullPolicy: IfNotPresent
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
