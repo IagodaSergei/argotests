@@ -186,7 +186,7 @@ cluster:
 
   # -- Name of the container image, supporting both tags (<image>:<tag>) and digests for deterministic and repeatable deployments:
   # <image>:<tag>@sha256:<digestValue>
-  imageName: "ghcr.io/cloudnative-pg/postgresql:18.6-standard-trixie"
+  imageName: "ghcr.io/cloudnative-pg/postgresql:18.6-system-trixie"
 
   # -- Reference to `ImageCatalog` of `ClusterImageCatalog`, if specified takes precedence over `cluster.imageName`
   imageCatalogRef: {}
